@@ -1,0 +1,13 @@
+{
+  "name": "xd_font_list",
+  "version": "1.0.0",
+  "description": "",
+  "main": "xd_font_list.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "devDependencies": {
+    "adm-zip": "^0.5.10"
+  }
+}
