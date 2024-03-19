@@ -37,12 +37,25 @@ class FontData {
 		if(this.usages.includes(name)) return;
 		this.usages.push(name);
 	}
+	/**
+	 * 使用箇所の一覧を文字列として取得する
+	 * @returns 使用箇所の一覧
+	 */
 	getUsages() {
 		let r = this.name + ':' + this.style + '\n';
 		for(const usage of this.usages) {
 			r += '  - ' + usage + '\n';
 		}
 		return r;
+	}
+	/**
+	 * 名前で比較する
+	 * @param {FontData} font 比較するフォントデータ
+	 * @returns {int} 比較結果
+	 */
+	compareByName(font) {
+		if (typeof this.postScriptName === 'string') return this.postScriptName.localeCompare(font.postScriptName);
+		return 0;
 	}
 }
 /** アートボード */
@@ -229,11 +242,28 @@ class XdFonts {
 // パラメータからxdファイルを読み込む
 let args = process.argv.slice(2);
 (async () => {
+	if (args.length <= 0) {
+		console.log('使い方');
+		console.log(`node xd_font_list.js path/to/file.xd [-l]`);
+		console.log(`オプション`);
+		console.log(`  -l: リストのみ`);
+		return;
+	}
+
+	let isListOnly = args.includes("-l");
+	let filePath = args[0];
 	const xdFonts = new XdFonts();
-	let fonts = await xdFonts.makeList(args[0]);
+	let fonts = await xdFonts.makeList(filePath);
+	fonts = Object.values(fonts);
+	// フォント名順でソート
+	fonts.sort((a, b) => a.compareByName(b));
 	// フォント
-	Object.keys(fonts).forEach(key => {
-		console.log(`${fonts[key].getUsages()}`);
-	});
+	for(let font of fonts) {
+		if (isListOnly) {
+			console.log(`${font.postScriptName}`);
+		} else {
+			console.log(`${font.getUsages()}`);
+		}
+	}
 })();
 
